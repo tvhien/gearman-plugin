@@ -1,4 +1,5 @@
 Project
 =======
-Project is hosted on git.openstack.org
+Project is hosted here:
 https://git.openstack.org/openstack-infra/gearman-plugin
+
