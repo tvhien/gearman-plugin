@@ -81,6 +81,13 @@ public class StopJobWorker extends AbstractGearmanFunction {
         if (build != null) {
             if (build.isBuilding()) {
                 Executor executor = build.getExecutor();
+                if (executor == null) {
+                    executor = build.getOneOffExecutor();
+                }
+                if (executor == null) {
+                    throw new IllegalArgumentException("Cannot find executor for build " +
+                                                       jobName + ": " + buildNumber);
+                }
                 // abort the running jenkins build
                 if (!executor.isInterrupted()) {
                     executor.interrupt();
