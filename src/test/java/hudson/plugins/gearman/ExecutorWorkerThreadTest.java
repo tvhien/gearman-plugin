@@ -26,6 +26,7 @@ import hudson.slaves.DumbSlave;
 
 import java.util.Set;
 
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -241,5 +242,26 @@ public class ExecutorWorkerThreadTest{
 
         assertEquals(0, functions.size());
     }
+
+    /*
+     * This test verifies that gearman functions are correctly registered for a
+     * workflow project. All workflow projects have are executed on master itself,
+     * so they have default assigned labels "master", {@link WorkflowJob#getAssignedLabel}
+     */
+    @Test
+    public void testRegisterJobs_WorkflowProject() throws Exception {
+
+        WorkflowJob lemon = j.createProject(WorkflowJob.class,"lemon");
+
+        AbstractWorkerThread oneiric = new ExecutorWorkerThread("GearmanServer", 4730, "MyWorker", j.jenkins.getComputer(""), "master", new NoopAvailabilityMonitor());
+        oneiric.testInitWorker();
+        oneiric.registerJobs();
+        Set<String> functions = oneiric.worker.getRegisteredFunctions();
+
+        assertEquals(2, functions.size());
+        assertTrue(functions.contains("build:lemon"));
+        assertTrue(functions.contains("build:lemon:master"));
+    }
+
 
 }

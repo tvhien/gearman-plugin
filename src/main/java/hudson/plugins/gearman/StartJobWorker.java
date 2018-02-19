@@ -19,17 +19,8 @@
 
 package hudson.plugins.gearman;
 
-import hudson.model.Action;
-import hudson.model.ParameterValue;
-import hudson.model.Result;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Cause;
-import hudson.model.Computer;
-import hudson.model.Queue;
+import hudson.model.*;
 import hudson.model.labels.LabelAtom;
-import hudson.model.Node;
-import hudson.model.TextParameterValue;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.slaves.OfflineCause;
 
@@ -68,11 +59,11 @@ public class StartJobWorker extends AbstractGearmanFunction {
             .getLogger(Constants.PLUGIN_LOGGER_NAME);
 
     Computer computer;
-    AbstractProject<?, ?> project;
+    GearmanProject project;
     String masterName;
     MyGearmanWorkerImpl worker;
 
-    public StartJobWorker(AbstractProject<?, ?> project, Computer computer, String masterName,
+    public StartJobWorker(GearmanProject project, Computer computer, String masterName,
                           MyGearmanWorkerImpl worker) {
         this.project = project;
         this.computer = computer;
@@ -80,12 +71,10 @@ public class StartJobWorker extends AbstractGearmanFunction {
         this.worker = worker;
     }
 
-   private String buildStatusData(AbstractBuild<?, ?> build) {
-       AbstractProject<?, ?> project = build.getProject();
-
+   private String buildStatusData(Run<?, ?> build) {
        Map data = new HashMap<String, String>();
 
-       data.put("name", project.getName());
+       data.put("name", project.getJob().getName());
        data.put("number", build.getNumber());
        data.put("manager", masterName);
        data.put("worker", this.worker.getWorkerID());
@@ -100,16 +89,10 @@ public class StartJobWorker extends AbstractGearmanFunction {
            data.put("result", result.toString());
        }
 
-       ArrayList<String> nodeLabels = new ArrayList<String>();
-       Node node = build.getBuiltOn();
-       if (node != null) {
-           Set<LabelAtom> nodeLabelAtoms = node.getAssignedLabels();
-           for (LabelAtom labelAtom : nodeLabelAtoms) {
-               nodeLabels.add(labelAtom.getDisplayName());
-           }
+       Map projectBuildData = project.getBuildData(build);
+       if(projectBuildData != null) {
+           data.putAll(projectBuildData);
        }
-       data.put("node_labels", nodeLabels);
-       data.put("node_name", node.getNodeName());
 
        Gson gson = new Gson();
        return gson.toJson(data);
@@ -182,8 +165,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
 
         // schedule jenkins to build project
         logger.info("---- Worker " + this.worker + " scheduling " +
-                    project.getName()+" build #" +
-                    project.getNextBuildNumber()+" on " + runNodeName
+                    project.getJob().getName()+" build #" +
+                    project.getJob().getNextBuildNumber()+" on " + runNodeName
                     + " with UUID " + decodedUniqueId + " and build params " + buildParams);
         QueueTaskFuture<?> future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
 
@@ -206,7 +189,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
 
             // wait for start of build
             Queue.Executable exec = future.getStartCondition().get();
-            AbstractBuild<?, ?> currBuild = (AbstractBuild<?, ?>) exec;
+            // use common output
+            Run<?, ?> currBuild = (Run<?, ?>) exec;
 
             if (!offlineWhenComplete) {
                 // Unlock the monitor for this worker
