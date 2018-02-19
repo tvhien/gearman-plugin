@@ -18,9 +18,7 @@
 
 package hudson.plugins.gearman;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for the {@link AbstractWorkerThread} class.
@@ -44,6 +43,7 @@ public class AbstractWorkerThreadTest {
    */
     @Before
     public void setUp() {
+        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
         GearmanWorker gearmanWorker = mock(GearmanWorker.class);
         GearmanNIOJobServerConnection conn = new GearmanNIOJobServerConnection("localhost", 4730);
         doNothing().when(gearmanWorker).work();

@@ -26,7 +26,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Cause;
 import hudson.model.Computer;
-import hudson.model.Hudson;
 import hudson.model.Queue;
 import hudson.model.labels.LabelAtom;
 import hudson.model.Node;
@@ -40,9 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
+import jenkins.model.Jenkins;
 import org.gearman.client.GearmanIOEventListener;
 import org.gearman.client.GearmanJobResult;
 import org.gearman.client.GearmanJobResultImpl;
@@ -83,7 +81,6 @@ public class StartJobWorker extends AbstractGearmanFunction {
     }
 
    private String buildStatusData(AbstractBuild<?, ?> build) {
-       Hudson hudson = Hudson.getInstance();
        AbstractProject<?, ?> project = build.getProject();
 
        Map data = new HashMap<String, String>();
@@ -93,7 +90,7 @@ public class StartJobWorker extends AbstractGearmanFunction {
        data.put("manager", masterName);
        data.put("worker", this.worker.getWorkerID());
 
-       String rootUrl = Hudson.getInstance().getRootUrl();
+       String rootUrl = Jenkins.getInstance().getRootUrl();
        if (rootUrl != null) {
            data.put("url", rootUrl + build.getUrl());
        }

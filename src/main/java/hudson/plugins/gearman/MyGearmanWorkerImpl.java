@@ -30,11 +30,8 @@ import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -55,10 +52,8 @@ import org.gearman.common.GearmanSessionEvent;
 import org.gearman.common.GearmanSessionEventHandler;
 import org.gearman.common.GearmanTask;
 
-import org.gearman.worker.DefaultGearmanFunctionFactory;
 import org.gearman.worker.GearmanFunction;
 import org.gearman.worker.GearmanFunctionFactory;
-import org.gearman.worker.GearmanWorker;
 
 import org.gearman.util.ByteUtils;
 import org.slf4j.LoggerFactory;
