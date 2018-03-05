@@ -48,8 +48,7 @@ public class GearmanPluginConfigTest {
     public void setUp() {
         Jenkins jenkins = mock(Jenkins.class);
         PowerMockito.mockStatic(Jenkins.class);
-        when(Jenkins.getActiveInstance()).thenReturn(jenkins);
-
+        when(Jenkins.getInstance()).thenReturn(jenkins);
         gpc = new GearmanPluginConfig();
     }
 

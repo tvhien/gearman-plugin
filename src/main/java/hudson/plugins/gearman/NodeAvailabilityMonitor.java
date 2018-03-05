@@ -38,7 +38,7 @@ public class NodeAvailabilityMonitor implements AvailabilityMonitor {
     {
         this.computer = computer;
         queue = Queue.getInstance();
-        jenkins = Jenkins.getActiveInstance();
+        jenkins = Jenkins.getInstance();
     }
 
     public Computer getComputer() {
