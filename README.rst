@@ -1,3 +1,7 @@
+GoodData fork of gearman plugin. For releasing use standard release job in CI system.
+
+# Original description
+
 Overview
 ========
 This plugin uses Gearman to support multiple Jenkins masters.
