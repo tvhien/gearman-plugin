@@ -202,12 +202,12 @@ public class StartJobWorker extends AbstractGearmanFunction {
             int estimatedDuration = (int) currBuild.getEstimatedDuration();
             jobData = buildStatusData(currBuild);
 
-            sendData(jobData.getBytes());
+            sendData(jobData.getBytes("UTF-8"));
             sess.driveSessionIO();
             sendStatus(estimatedDuration, duration);
             sess.driveSessionIO();
 
-            exec = future.get();
+            future.get();
             jobData = buildStatusData(currBuild);
 
         } finally {
@@ -227,8 +227,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
         // return result to client
         GearmanJobResult gjr = new GearmanJobResultImpl(
                 this.jobHandle, true,
-                jobData.getBytes(), "".getBytes(),
-                "".getBytes(), 0, 0);
+                jobData.getBytes("UTF-8"), "".getBytes("UTF-8"),
+                "".getBytes("UTF-8"), 0, 0);
         return gjr;
     }
 }
