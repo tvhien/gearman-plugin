@@ -88,6 +88,7 @@
         <jenkins-workflow-cps-plugin>2.45</jenkins-workflow-cps-plugin>
         <jenkins-structs-plugin>1.14</jenkins-structs-plugin>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <findbugs.failOnError>false</findbugs.failOnError>
     </properties>
 
 
