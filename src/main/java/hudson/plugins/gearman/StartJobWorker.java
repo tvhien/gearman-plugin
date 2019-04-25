@@ -152,11 +152,16 @@ public class StartJobWorker extends AbstractGearmanFunction {
          */
         String runNodeName = GearmanPluginUtil.getRealName(computer);
 
+        // Why is the following line commented out? Let's not actually schedule the build
+        // on this node. Instead, have the Jenkins global Queue decide on which node is this
+        // build going to be launched.
         // create action to run on a specified computer
-        Action runNode = new NodeAssignmentAction(runNodeName);
+        // Action runNode = new NodeAssignmentAction(runNodeName);
         // create action for parameters
         Action params = new NodeParametersAction(buildParams, decodedUniqueId);
-        Action [] actions = {runNode, params};
+
+        //Action [] actions = {runNode, params};
+        Action [] actions = {params};
 
         AvailabilityMonitor availability =
             GearmanProxy.getInstance().getAvailabilityMonitor(computer);
@@ -166,8 +171,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
         // schedule jenkins to build project
         logger.info("---- Worker " + this.worker + " scheduling " +
                     project.getJob().getName()+" build #" +
-                    project.getJob().getNextBuildNumber()+" on " + runNodeName
-                    + " with UUID " + decodedUniqueId + " and build params " + buildParams);
+                    project.getJob().getNextBuildNumber() +
+                    " with UUID " + decodedUniqueId + " and build params " + buildParams);
         QueueTaskFuture<?> future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
 
         // check build and pass results back to client
