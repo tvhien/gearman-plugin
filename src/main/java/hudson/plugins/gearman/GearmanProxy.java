@@ -316,24 +316,27 @@ public class GearmanProxy {
         // run this build.
         ExecutorWorkerThread workerThread = null;
 
-        synchronized(gewtHandles) {
-            Computer computer = node.toComputer();
-            for (ExecutorWorkerThread t : gewtHandles) {
-                if (t.getComputer() == computer) {
-                    workerThread = t;
-                    break;
-                }
-            }
-        }
-
-        if (workerThread != null) {
-            if (workerThread.getAvailability().canTake(item)) {
-                return null;
-            } else {
-                return new CauseOfBlockage.BecauseNodeIsBusy(node);
-            }
-        }
+        // TEMPORARY; NEED TO DO IT PROPERLY BEFORE MERGING
         return null;
+
+//        synchronized(gewtHandles) {
+//            Computer computer = node.toComputer();
+//            for (ExecutorWorkerThread t : gewtHandles) {
+//                if (t.getComputer() == computer) {
+//                    workerThread = t;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (workerThread != null) {
+//            if (workerThread.getAvailability().canTake(item)) {
+//                return null;
+//            } else {
+//                return new CauseOfBlockage.BecauseNodeIsBusy(node);
+//            }
+//        }
+//        return null;
     }
 
     public void registerJobs() {

@@ -624,6 +624,7 @@ public class MyGearmanWorkerImpl implements GearmanSessionEventHandler {
             if (unique != null && unique.length > 0) {
                 function.setUniqueId(unique);
             }
+            availability.unlock(this);
             return function;
         }
         return null;
@@ -647,8 +648,6 @@ public class MyGearmanWorkerImpl implements GearmanSessionEventHandler {
         } catch (Exception e) {
             LOG.warn("---- Worker " + this + " exception while executing function " + fun.getName(), e);
         }
-        // Unlock the monitor for this worker
-        availability.unlock(this);
     }
 
     private GearmanPacketType getGrabJobPacketType() {
