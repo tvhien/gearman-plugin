@@ -159,6 +159,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
         // create action for parameters
         Action params = new NodeParametersAction(buildParams, decodedUniqueId);
 
+        QueueTaskFuture<?> future;
+
         // build on a specific node tied to the executor if custom gearman-plugin
         // scheduling is enabled
         if(GearmanPluginConfig.get().enableScheduling()) {
@@ -173,6 +175,8 @@ public class StartJobWorker extends AbstractGearmanFunction {
                         project.getJob().getName()+" build #" +
                         project.getJob().getNextBuildNumber()+" on " + runNodeName
                         + " with UUID " + decodedUniqueId + " and build params " + buildParams);
+            // schedule jenkins to build project
+            future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
         }
         else {
             Action [] actions = {params};
@@ -181,10 +185,9 @@ public class StartJobWorker extends AbstractGearmanFunction {
                         project.getJob().getName()+" build #" +
                         project.getJob().getNextBuildNumber() +
                         " with UUID " + decodedUniqueId + " and build params " + buildParams);
+            // schedule jenkins to build project
+            future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
         }
-
-        // schedule jenkins to build project
-        QueueTaskFuture<?> future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
 
         // check build and pass results back to client
         String jobData;
