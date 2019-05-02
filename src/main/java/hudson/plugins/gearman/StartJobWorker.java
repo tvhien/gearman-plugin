@@ -148,26 +148,42 @@ public class StartJobWorker extends AbstractGearmanFunction {
         }
 
         /*
-         * make this node build this project with unique id and build params from the client
+         * build this project with unique id and build params from the client
          */
-        String runNodeName = GearmanPluginUtil.getRealName(computer);
-
-        // create action to run on a specified computer
-        Action runNode = new NodeAssignmentAction(runNodeName);
-        // create action for parameters
-        Action params = new NodeParametersAction(buildParams, decodedUniqueId);
-        Action [] actions = {runNode, params};
 
         AvailabilityMonitor availability =
-            GearmanProxy.getInstance().getAvailabilityMonitor(computer);
+                GearmanProxy.getInstance().getAvailabilityMonitor(computer);
 
         availability.expectUUID(decodedUniqueId);
 
+        // create action for parameters
+        Action params = new NodeParametersAction(buildParams, decodedUniqueId);
+
+        // build on a specific node tied to the executor if custom gearman-plugin
+        // scheduling is enabled
+        if(GearmanPluginConfig.get().enableScheduling()) {
+            String runNodeName = GearmanPluginUtil.getRealName(computer);
+
+            // create action to run on a specified computer
+            Action runNode = new NodeAssignmentAction(runNodeName);
+
+            Action [] actions = {runNode, params};
+
+            logger.info("---- Worker " + this.worker + " scheduling " +
+                        project.getJob().getName()+" build #" +
+                        project.getJob().getNextBuildNumber()+" on " + runNodeName
+                        + " with UUID " + decodedUniqueId + " and build params " + buildParams);
+        }
+        else {
+            Action [] actions = {params};
+
+            logger.info("---- Worker " + this.worker + " scheduling " +
+                        project.getJob().getName()+" build #" +
+                        project.getJob().getNextBuildNumber() +
+                        " with UUID " + decodedUniqueId + " and build params " + buildParams);
+        }
+
         // schedule jenkins to build project
-        logger.info("---- Worker " + this.worker + " scheduling " +
-                    project.getJob().getName()+" build #" +
-                    project.getJob().getNextBuildNumber()+" on " + runNodeName
-                    + " with UUID " + decodedUniqueId + " and build params " + buildParams);
         QueueTaskFuture<?> future = project.scheduleBuild2(0, new Cause.UserIdCause(), actions);
 
         // check build and pass results back to client
