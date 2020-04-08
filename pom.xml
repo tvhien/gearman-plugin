@@ -66,12 +66,13 @@
         </snapshotRepository>
     </distributionManagement>
 
+<!-- #we don't need download tarball anymore, now we build from the source code
     <scm>
         <connection>scm:git:git@github.com:gooddata/gearman-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:gooddata/gearman-plugin.git</developerConnection>
         <url>https://github.com/gooddata/gearman-plugin</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm> -->
 
     <properties>
         <java.level>8</java.level>
